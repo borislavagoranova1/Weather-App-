@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  
+  <!-- Google Fonts: Nunito with all needed weights (300 to 800) -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="weather-container">
+    <h1>Weather App</h1>
+
+    <!-- Search Section -->
+    <form class="search-form" id="search-form">
+      <div class="search-label">Enter a city:</div>
+      <div class="search-input-wrapper">
+        <input type="text" id="city-input" placeholder="e.g. Sofia" required autocomplete="off">
+      </div>
+      <button type="submit">Search</button>
+    </form>
+
+    <!-- UI Indicators -->
+    <div class="loading" id="loading">Fetching data...</div>
+    <div class="error-msg" id="error">City not found. Please try again!</div>
+
+    <!-- Main Dynamic Content -->
+    <div class="weather-content" id="weather-content">
+      
+      <div class="location-header">
+        <div class="city-name" id="city-name">Sofia</div>
+        <div class="date-sub" id="current-date">Saturday, 13 June 2026</div>
+        <div class="condition-text" id="condition-text">Clear sky</div>
+        <button class="unit-toggle" id="unit-toggle">°C / °F</button>
+      </div>
+
+      <!-- Hero Temperature Card -->
+      <div class="hero-temp-box">
+        <div class="main-temp-value" id="current-temp">--°C</div>
+        <div class="hl-values" id="hl-values">H:--° L:--°</div>
+      </div>
+
+      <!-- Organized Aesthetic Metrics Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-card-top">🤔 Feels Like</div>
+          <div class="metric-card-value" id="feels-like">--°C</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card-top">💨 Wind Speed</div>
+          <div class="metric-card-value" id="wind-speed">-- m/s</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card-top">💧 Humidity</div>
+          <div class="metric-card-value" id="humidity">--%</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card-top">☀️ UV Index</div>
+          <div class="metric-card-value" id="uv-index">--</div>
+        </div>
+      </div>
+      
+      <!-- Rain probability card -->
+      <div class="metric-card" style="margin-bottom: 25px;">
+        <div class="metric-card-top">🌧️ Rain Probability</div>
+        <div class="metric-card-value" id="pop">--%</div>
+      </div>
+
+      <!-- Hourly Forecast Section -->
+      <div class="section-title">⏱ nighttime & daytime Hourly Forecast</div>
+      <div class="hourly-chart-container" id="hourly-chart"></div>
+
+      <!-- 7-Day Forecast Section -->
+      <div class="section-title">📅 7-Day Forecast</div>
+      <div class="daily-forecast-list" id="daily-forecast"></div>
+      
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
