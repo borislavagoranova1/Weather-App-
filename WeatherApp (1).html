@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  
+  <!-- Google Fonts: Nunito with all needed weights (300 to 800) -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ── STYLISH COLOR PALETTE (Pink, Orange, Yellow Sunset Gradient) ── */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f18ab3 0%, #f69771 45%, #ffdc7b 100%);
+      --card-bg: rgba(255, 255, 255, 0.22); /* Smooth Glassmorphism */
+      --card-border: rgba(255, 255, 255, 0.4);
+      --inner-card: rgba(255, 255, 255, 0.15);
+      --input-bg: rgba(255, 255, 255, 0.5);
+      --btn-bg: #e76f51;
+      --btn-hover: #f4a261;
+      --text-main: #4a2810; /* Elegant deep tone for contrast and legibility */
+      --text-white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif; /* Applied everywhere globally */
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── MAIN WEATHER CONTAINER ── */
+    .weather-container {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 32px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 25px 50px rgba(74, 40, 16, 0.12);
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 25px;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+
+    /* ── MINIMALIST SEARCH FORM ── */
+    .search-form {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+      align-items: center;
+    }
+
+    .search-label {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+      max-width: 50px;
+      opacity: 0.9;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-form input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 16px;
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .search-form input:focus {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: var(--btn-bg);
+    }
+
+    .search-form button {
+      padding: 14px 24px;
+      border: none;
+      border-radius: 16px;
+      background: var(--btn-bg);
+      color: var(--text-white);
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(231, 111, 81, 0.2);
+    }
+
+    .search-form button:hover {
+      background: var(--btn-hover);
+      transform: translateY(-1px);
+    }
+
+    /* ── WEATHER CONTENT ANIMATION ── */
+    .weather-content {
+      display: none;
+      animation: fadeInSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .location-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .city-name {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .date-sub {
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    .condition-text {
+      font-size: 17px;
+      font-weight: 700;
+      margin-top: 6px;
+      text-transform: capitalize;
+    }
+
+    /* ── HERO TEMPERATURE BLOCK ── */
+    .hero-temp-box {
+      background: rgba(255, 255, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 24px;
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
+    }
+
+    .main-temp-value {
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text-main);
+      letter-spacing: -1.5px;
+    }
+
+    .hl-values {
+      font-size: 15px;
+      font-weight: 700;
+      opacity: 0.8;
+      margin-top: 6px;
+    }
+
+    /* ── METRICS GRID ── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .metric-card {
+      background: var(--inner-card);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-card-top {
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0.75;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .metric-card-value {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* ── SECTION TITLES ── */
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 14px;
+      opacity: 0.85;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── HOURLY FORECAST GRAPH ── */
+    .hourly-chart-container {
+      background: var(--inner-card);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 20px 15px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      height: 150px;
+    }
+
+    .chart-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      flex: 1;
+      gap: 8px;
+    }
+
+    .chart-bar-wrapper {
+      height: 75px;
+      width: 14px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .chart-bar {
+      width: 100%;
+      background: linear-gradient(to top, var(--btn-bg), var(--btn-hover));
+      border-radius: 20px;
+      height: 0%;
+      transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chart-temp {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .chart-time {
+      font-size: 12px;
+      font-weight: 700;
+      opacity: 0.65;
+    }
+
+    /* ── 7-DAY FORECAST LIST ── */
+    .daily-forecast-list {
+      background: var(--inner-card);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 10px 18px;
+    }
+
+    .daily-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(74, 40, 16, 0.08);
+      font-size: 15px;
+    }
+
+    .daily-row:last-child {
+      border-bottom: none;
+    }
+
+    .daily-day {
+      font-weight: 700;
+      width: 110px;
+    }
+
+    .daily-pop {
+      font-size: 12px;
+      color: #2a6f97;
+      font-weight: 800;
+      width: 60px;
+      text-align: center;
+    }
+
+    .daily-temps {
+      font-weight: 600;
+      text-align: right;
+      width: 90px;
+    }
+
+    .daily-temps .max-t { font-weight: 700; }
+    .daily-temps .min-t { opacity: 0.5; margin-left: 6px; }
+
+    /* STATUS STATES */
+    .loading { display: none; text-align: center; font-size: 15px; font-weight: 700; margin-bottom: 20px; animation: pulse 1.5s infinite; }
+    .error-msg { display: none; text-align: center; background: rgba(231, 111, 81, 0.15); border: 1px solid rgba(231, 111, 81, 0.3); padding: 14px; border-radius: 16px; font-size: 14px; margin-bottom: 20px; color: #b73a1c; font-weight: 700; }
+
+    @keyframes fadeInSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="weather-container">
+    <h1>Weather App</h1>
+
+    <!-- Search Section -->
+    <form class="search-form" id="search-form">
+      <div class="search-label">Enter a city:</div>
+      <div class="search-input-wrapper">
+        <input type="text" id="city-input" placeholder="e.g. Sofia" required autocomplete="off">
+      </div>
+      <button type="submit">Search</button>
+    </form>
+
+    <!-- UI Indicators -->
+    <div class="loading" id="loading">Fetching data...</div>
+    <div class="error-msg" id="error">City not found. Please try again!</div>
+
+    <!-- Main Dynamic Content -->
+    <div class="weather-content" id="weather-content">
+      
+      <div class="location-header">
+        <div class="city-name" id="city-name">Sofia</div>
+        <div class="date-sub" id="current-date">Saturday, 13 June 2026</div>
+        <div class="condition-text" id="condition-text">Clear sky</div>
+      </div>
+
+      <!-- Hero Temperature Card (with dynamic High & Low values from image_dda64d.png layout) -->
+      <div class="hero-temp-box">
+        <div class="main-temp-value" id="current-temp">--°C</div>
+        <div class="hl-values" id="hl-values">H:--° L:--°</div>
+      </div>
+
+      <!-- Organized Aesthetic Metrics Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-card-top">🤔 Feels Like</div>
+          <div class="metric-card-value" id="feels-like">--°C</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card-top">💨 Wind Speed</div>
+          <div class="metric-card-value" id="wind-speed">-- m/s</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card-top">💧 Humidity</div>
+          <div class="metric-card-value" id="humidity">--%</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card-top">☀️ UV Index</div>
+          <div class="metric-card-value" id="uv-index">--</div>
+        </div>
+      </div>
+      
+      <!-- Rain probability card -->
+      <div class="metric-card" style="margin-bottom: 25px;">
+        <div class="metric-card-top">🌧️ Rain Probability</div>
+        <div class="metric-card-value" id="pop">--%</div>
+      </div>
+
+      <!-- Hourly Forecast Section -->
+      <div class="section-title">⏱ nighttime & daytime Hourly Forecast</div>
+      <div class="hourly-chart-container" id="hourly-chart"></div>
+
+      <!-- 7-Day Forecast Section -->
+      <div class="section-title">📅 7-Day Forecast</div>
+      <div class="daily-forecast-list" id="daily-forecast"></div>
+      
+    </div>
+  </div>
+
+  <script>
+    const searchForm = document.getElementById('search-form');
+    const cityInput = document.getElementById('city-input');
+    const weatherContent = document.getElementById('weather-content');
+    const loadingEl = document.getElementById('loading');
+    const errorEl = document.getElementById('error');
+
+    const cityNameEl = document.getElementById('city-name');
+    const currentDateEl = document.getElementById('current-date');
+    const conditionTextEl = document.getElementById('condition-text');
+    const currentTempEl = document.getElementById('current-temp');
+    const hlValuesEl = document.getElementById('hl-values');
+    const feelsLikeEl = document.getElementById('feels-like');
+    const windSpeedEl = document.getElementById('wind-speed');
+    const humidityEl = document.getElementById('humidity');
+    const uvIndexEl = document.getElementById('uv-index');
+    const popEl = document.getElementById('pop');
+    const hourlyChartEl = document.getElementById('hourly-chart');
+    const dailyForecastEl = document.getElementById('daily-forecast');
+
+    const weatherCodes = {
+      0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
+      45: 'Fog', 48: 'Depositing rime fog', 51: 'Light drizzle', 53: 'Moderate drizzle',
+      55: 'Dense drizzle', 61: 'Slight rain', 63: 'Moderate rain', 65: 'Heavy rain',
+      71: 'Slight snow', 73: 'Moderate snow', 75: 'Heavy snow', 95: 'Thunderstorm'
+    };
+
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    searchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const city = cityInput.value.trim();
+      if (!city) return;
+
+      loadingEl.style.display = 'block';
+      errorEl.style.display = 'none';
+      weatherContent.style.display = 'none';
+
+      try {
+        // 1. Geocoding
+        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
+        const geoResponse = await fetch(geoUrl);
+        const geoData = await geoResponse.json();
+
+        if (!geoData.results || geoData.results.length === 0) throw new Error('City not found');
+        const { latitude, longitude, name: correctName } = geoData.results[0];
+
+        // 2. Fetch complete weather records
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m,uv_index&hourly=temperature_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`;
+        const weatherResponse = await fetch(weatherUrl);
+        const weatherData = await weatherResponse.json();
+
+        // Format and display current system/location date dynamically
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        currentDateEl.textContent = new Date().toLocaleDateString('en-US', options);
+
+        // 3. Render Current Elements
+        const current = weatherData.current;
+        const daily = weatherData.daily;
+        
+        cityNameEl.textContent = correctName;
+        conditionTextEl.textContent = weatherCodes[current.weather_code] || 'Variable Conditions';
+        currentTempEl.textContent = `${current.temperature_2m.toFixed(0)}°`;
+        hlValuesEl.textContent = `H:${daily.temperature_2m_max[0].toFixed(0)}° L:${daily.temperature_2m_min[0].toFixed(0)}°`;
+        
+        feelsLikeEl.textContent = `${current.apparent_temperature.toFixed(0)}°C`;
+        windSpeedEl.textContent = `${current.wind_speed_10m.toFixed(1)} m/s`;
+        humidityEl.textContent = `${current.relative_humidity_2m}%`;
+        uvIndexEl.textContent = current.uv_index.toFixed(1);
+        popEl.textContent = `${current.precipitation_probability}%`;
+
+        // 4. Render Hourly Chart Bars
+        hourlyChartEl.innerHTML = '';
+        const currentHourIndex = new Date().getHours();
+        const nextHoursTemps = weatherData.hourly.temperature_2m.slice(currentHourIndex, currentHourIndex + 5);
+        const maxHourlyTemp = Math.max(...nextHoursTemps);
+        const minHourlyTemp = Math.min(...nextHoursTemps);
+
+        nextHoursTemps.forEach((temp, index) => {
+          const hourLabel = (currentHourIndex + index) % 24;
+          const percentage = maxHourlyTemp === minHourlyTemp ? 50 : ((temp - minHourlyTemp) / (maxHourlyTemp - minHourlyTemp)) * 70 + 30;
+
+          const col = document.createElement('div');
+          col.className = 'chart-column';
+          col.innerHTML = `
+            <div class="chart-temp">${temp.toFixed(0)}°</div>
+            <div class="chart-bar-wrapper">
+              <div class="chart-bar" style="height: ${percentage}%"></div>
+            </div>
+            <div class="chart-time">${hourLabel.toString().padStart(2, '0')}:00</div>
+          `;
+          hourlyChartEl.appendChild(col);
+        });
+
+        // 5. Render 7-Day Forecast Rows
+        dailyForecastEl.innerHTML = '';
+
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(daily.time[i]);
+          const dayName = i === 0 ? 'Today' : daysOfWeek[date.getDay()];
+          const maxT = daily.temperature_2m_max[i].toFixed(0);
+          const minT = daily.temperature_2m_min[i].toFixed(0);
+          const popMax = daily.precipitation_probability_max[i];
+
+          const row = document.createElement('div');
+          row.className = 'daily-row';
+          row.innerHTML = `
+            <div class="daily-day">${dayName}</div>
+            <div class="daily-pop">${popMax > 0 ? '💧 ' + popMax + '%' : ''}</div>
+            <div class="daily-temps">
+              <span class="max-t">${maxT}°</span>
+              <span class="min-t">${minT}°</span>
+            </div>
+          `;
+          dailyForecastEl.appendChild(row);
+        }
+
+        loadingEl.style.display = 'none';
+        weatherContent.style.display = 'block';
+
+      } catch (error) {
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
